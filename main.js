@@ -6,6 +6,19 @@ let ctx = cnv.getContext("2d");
 cnv.width = 800;
 cnv.height = 600;
 
+// Output variables
+let level = document.getElementById("level");
+let timer = document.getElementById("timer");
+let hits = document.getElementById("hits");
+let misses = document.getElementById("misses");
+let accuracy = document.getElementById("accuracy");
+let timerInterval;
+let hitCount = 0;
+let missCount = 0;
+let startTime;
+let levelDuration = 20;
+let currentLvl = 0;
+
 // GLOBAL VARIABLES
 let circles = [];
 let rects = [];
@@ -18,17 +31,11 @@ let player = {
   color: "blue",
   speed: 5,
 };
-
-// CHECK LVL SELECTION
-function currentLvl(level){
-    let level = document.getElementById("diffSelect").value;
-    if (level === "easy"){
-        circles.speed = 2;
-        circles.size
-        rects.speed = 1;
-
-    }
-}
+let levels = [
+{ name: "easy", circleSize: 20, rectSize: 30, circleSpeed: 1, rectSpeed: 1 },
+{ name: "medium", circleSize: 15, rectSize: 20, circleSpeed: 2, rectSpeed: 2 },
+{ name: "hard", circleSize: 10, rectSize: 15, circleSpeed: 3, rectSpeed: 3 }
+];
 
 // START DRAW FUNCTION ON PAGE LOAD
 window.addEventListener("load", draw);
@@ -36,7 +43,6 @@ window.addEventListener("load", draw);
 function draw() {
   // GAME STATE
   if (state === "start") {
-    currentLvl();
     startScreen();
   } else if (state === "running") {
     gameLogic();
@@ -49,30 +55,36 @@ function draw() {
   requestAnimationFrame(draw);
 }
 
-// Generate objects
 
-function generateCircles(){
-  let circle = {
-    x: randomInt(0, cnv.width),
-    y: randomInt(0, cnv.height),
-    radius: randomInt(10, 30),
-    color: randomRGB(),
-    speed: 0,
-    active: true,
-  };
-  circles.push(circle);
+// Create Circles and Rects
+
+function createCircles(count, size, speed) {
+  for (let i = 0; i < count; i++){
+    let circle = {
+      x: Math.random() * (cnv.width - size * 2) + size,
+      y: Math.random() * (cnv.height - size * 2) + size,
+      radius: size,
+      dx: (Math.random() - 0.5) * speed,
+      dy: (Math.random() - 0.5) * speed,
+      color: randomRGB()
+    };
+    circles.push(circle[i]);
+  }
 }
 
-function generateRect(){
-  let rect = {
-    x: randomInt(0, cnv.width),
-    y: randomInt(0, cnv.height),
-    size: randomInt(20, 40),
-    color: randomRGB(),
-    speed: 0, 
-    active: true,
-  };
-  rects.push(rect);
+function createRects(count, size, speed){
+  for (let i = 0; i < count; i++){
+    let rect = {
+      x: Math.random() * (cnv.width - size),
+      y: Math.random() * (cnv.height - size),
+      width: size,
+      height: size,
+      dx: (Math.random() - 0.5) * speed,
+      dy: (Math.random() - 0.5) * speed,
+      color: "#FF0000"
+    };
+    rects.push(rect);
+  }
 }
 
 // EVENT STUFF
@@ -87,4 +99,3 @@ function keydownHandler(e) {
     reset();
   }
 }
-
